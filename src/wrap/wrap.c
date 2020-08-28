@@ -36,6 +36,10 @@ unsigned long wrap_add32(unsigned int a, unsigned int b) {
 [[rc::exists("r : Z")]]
 [[rc::returns("r @ int<u32>")]]
 [[rc::ensures("{y ≤ x  → r = x - y}")]]
+// [[rc::ensures("{y > x →  r = x - y + 4294967295 + 1}")]] // error (1)
+// [[rc::ensures("{y > x → r > x - y + 1}")]] // error (2)
+// [[rc::ensures("{y > x → r ≥ x - y + 429467296%Z}")]] // error (3)
+[[rc::ensures("{y > x → x - y ≤ r}")]]
 unsigned int wrap_sub32(unsigned int x, unsigned int y) {
 	if (x >= y) {
 		return x - y;
@@ -43,7 +47,7 @@ unsigned int wrap_sub32(unsigned int x, unsigned int y) {
   
   return x;
   if (y <= (unsigned int) INT_MAX) { // y <= INT_MAX && x < y
-    unsigned int y1 = ((UINT_MAX / (unsigned int) 2) - y) + (unsigned int) 1;
+    unsigned int y1 = (UINT_MAX - y) + (unsigned int) 1;
     return (x + y1);
 	}
 
@@ -51,5 +55,26 @@ unsigned int wrap_sub32(unsigned int x, unsigned int y) {
     return (x - (y - (UINT_MAX / (unsigned int) 2))) + (UINT_MAX / (unsigned int) 2);
 	}
   // x <= INT_MAX && y > INT_MAX && x > y
-  return (x + (UINT_MAX / (unsigned int) 2)) - (y - (UINT_MAX / (unsigned int) 22));
+  return (x + (UINT_MAX / (unsigned int) 2)) - (y - (UINT_MAX / (unsigned int) 2));
 }
+
+[[rc::parameters("x : Z", "y : Z")]]
+[[rc::args("x @ int<u32>", "y @ int<u32>")]]
+[[rc::exists("r : Z")]]
+[[rc::returns("r @ int<u32>")]]
+[[rc::ensures("{y = x  → r ≤ x}")]]
+[[rc::ensures("{y = x  → ~(r < x)}")]]
+[[rc::ensures("{y < x  → r ≤ y + 1}")]]
+[[rc::ensures("{y < x  → ~(r < y + 1)}")]]
+[[rc::ensures("{y > x  → r ≤ x + 1}")]]
+[[rc::ensures("{y > x  → ~(r < x + 1)}")]]
+unsigned int math_equal(unsigned int x, unsigned int y) {
+  if (x == y) {
+    return x; 
+  } else if (x < y) {
+    return x + 1; 
+  } else {
+    return y + 1;
+  }
+}
+
