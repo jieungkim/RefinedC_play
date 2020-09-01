@@ -6,7 +6,7 @@
 unsigned long uint64_dummy(unsigned int a) {
   if (a <= (unsigned int) 1000) {
     return 1;
-  } 
+  }
   return 10000;
 }
 
@@ -41,19 +41,19 @@ unsigned long wrap_add32(unsigned int a, unsigned int b) {
 // [[rc::ensures("{y > x → r ≥ x - y + 429467296%Z}")]] // error (3)
 [[rc::ensures("{y > x → x - y ≤ r}")]]
 unsigned int wrap_sub32(unsigned int x, unsigned int y) {
-	if (x >= y) {
-		return x - y;
-	}
+    if (x >= y) {
+        return x - y;
+    }
   
   return x;
   if (y <= (unsigned int) INT_MAX) { // y <= INT_MAX && x < y
     unsigned int y1 = (UINT_MAX - y) + (unsigned int) 1;
     return (x + y1);
-	}
+    }
 
   if (x > (unsigned int) INT_MAX) { // x > INT_MAX && y > INT_MAX && x < y
     return (x - (y - (UINT_MAX / (unsigned int) 2))) + (UINT_MAX / (unsigned int) 2);
-	}
+    }
   // x <= INT_MAX && y > INT_MAX && x > y
   return (x + (UINT_MAX / (unsigned int) 2)) - (y - (UINT_MAX / (unsigned int) 2));
 }
@@ -70,11 +70,12 @@ unsigned int wrap_sub32(unsigned int x, unsigned int y) {
 [[rc::ensures("{y > x  → ~(r < x + 1)}")]]
 unsigned int math_equal(unsigned int x, unsigned int y) {
   if (x == y) {
-    return x; 
+    return x;
   } else if (x < y) {
-    return x + 1; 
+    return x + 1;
   } else {
     return y + 1;
   }
 }
+
 
